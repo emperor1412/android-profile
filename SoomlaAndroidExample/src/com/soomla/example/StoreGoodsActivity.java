@@ -33,6 +33,7 @@ import android.widget.TextView;
 import com.soomla.BusProvider;
 import com.soomla.Soomla;
 import com.soomla.SoomlaUtils;
+import com.soomla.example.R;
 import com.soomla.profile.data.PJSONConsts;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.store.SoomlaStore;

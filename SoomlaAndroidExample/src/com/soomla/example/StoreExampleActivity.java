@@ -37,8 +37,10 @@ import android.widget.TextView;
 import com.soomla.BusProvider;
 import com.soomla.Soomla;
 import com.soomla.SoomlaApp;
+//import com.socialvoucher.gameshop;
 import com.soomla.SoomlaConfig;
 import com.soomla.SoomlaUtils;
+import com.soomla.example.R;
 import com.soomla.profile.SoomlaProfile;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.store.*;
@@ -130,8 +132,8 @@ public class StoreExampleActivity extends Activity {
                 HashMap<IProvider.Provider, HashMap<String, String>>();
 
         HashMap<String, String> twitterParams = new HashMap<String, String>();
-        twitterParams.put("consumerKey", "T8NMGwKq6USYCjZox86Bxd2RJ");
-        twitterParams.put("consumerSecret", "TO88J9QjIJlSGfuyfza9Ox2OgTsLc1rjcmaJknlIMuUw0T1I30");
+        twitterParams.put("consumerKey", "B8tcd5BdFU4EvwhO0zkB6i8eA");
+        twitterParams.put("consumerSecret", "5l5mknNzDCGb2SCo1HzEYFExZaULU3AInEXf9L2cl9gyIxvFTi");
         providerParams.put(IProvider.Provider.TWITTER, twitterParams);
 
         SoomlaProfile.getInstance().initialize(providerParams);

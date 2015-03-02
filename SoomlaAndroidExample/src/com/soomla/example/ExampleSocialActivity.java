@@ -45,6 +45,7 @@ import android.widget.Toast;
 
 import com.soomla.BusProvider;
 import com.soomla.SoomlaUtils;
+import com.soomla.example.R;
 import com.soomla.profile.SoomlaProfile;
 import com.soomla.profile.domain.IProvider;
 import com.soomla.profile.domain.UserProfile;

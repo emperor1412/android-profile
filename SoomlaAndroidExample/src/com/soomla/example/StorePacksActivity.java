@@ -32,6 +32,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.soomla.BusProvider;
+import com.soomla.example.R;
 import com.soomla.store.data.StorageManager;
 import com.soomla.store.data.StoreInfo;
 import com.soomla.store.domain.virtualCurrencies.VirtualCurrencyPack;

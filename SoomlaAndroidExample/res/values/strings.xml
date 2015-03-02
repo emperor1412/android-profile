@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SOOMLA Store Example</string>
-    <string name="fb_app_id">409611972431183</string>
+    <string name="fb_app_id">555678924563337</string>
     <string name="btn_contentDescription">Click to open store</string>
     <string name="info_text">Click the soomla logo to open store</string>
     <string name="title">SOOMLA Store Example</string>

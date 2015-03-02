@@ -154,7 +154,8 @@ public class SoomlaTwitter implements ISocialProvider {
         public void gotUserDetail(User user) {
             SoomlaUtils.LogDebug(TAG, "getUserProfile/onComplete");
             UserProfile userProfile = createUserProfile(user);
-
+            userProfile.setAccessToken(KeyValueStorage.getValue(getTwitterStorageKey(TWITTER_OAUTH_TOKEN)));
+            userProfile.setSecretKey(KeyValueStorage.getValue(getTwitterStorageKey(TWITTER_OAUTH_SECRET)));
             RefUserProfileListener.success(userProfile);
 
             clearListener(ACTION_GET_USER_PROFILE);

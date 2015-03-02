@@ -81,6 +81,15 @@ public class UserProfile {
         try {
         this.mBirthday = jsonObject.getString(PJSONConsts.UP_BIRTHDAY);
         } catch (JSONException ignored) {}
+
+        try {
+            this.mAccessToken = jsonObject.getString(PJSONConsts.UP_ACCESSTOKEN);
+        } catch (JSONException e) {}
+
+
+        try {
+            this.mSecretKey= jsonObject.getString(PJSONConsts.UP_SECRETKEY);
+        } catch (JSONException e) {}
     }
 
     /**
@@ -104,6 +113,8 @@ public class UserProfile {
             jsonObject.put(PJSONConsts.UP_GENDER, mGender);
             jsonObject.put(PJSONConsts.UP_LANGUAGE, mLanguage);
             jsonObject.put(PJSONConsts.UP_BIRTHDAY, mBirthday);
+            jsonObject.put(PJSONConsts.UP_ACCESSTOKEN, mAccessToken);
+            jsonObject.put(PJSONConsts.UP_SECRETKEY, mSecretKey);
         } catch (JSONException e) {
             SoomlaUtils.LogError(TAG, "An error occurred while generating JSON object.");
         }
@@ -180,6 +191,22 @@ public class UserProfile {
         this.mBirthday = birthday;
     }
 
+    public String getAccessToken() {
+        return  mAccessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.mAccessToken= accessToken;
+    }
+
+    public String getSecretKey() {
+        return mSecretKey;
+    }
+
+    public void setSecretKey(String secretKey) {
+        this.mSecretKey= secretKey;
+    }
+
 
     /** Private Members **/
 
@@ -195,4 +222,6 @@ public class UserProfile {
     private String mGender;
     private String mLanguage;
     private String mBirthday;
+    private String mAccessToken;
+    private String mSecretKey;
 }

@@ -35,4 +35,6 @@ public class PJSONConsts {
     public static final String UP_GENDER           = "gender";
     public static final String UP_LANGUAGE         = "language";
     public static final String UP_BIRTHDAY         = "birthday";
+    public static final String UP_ACCESSTOKEN      = "accessToken";
+    public static final String UP_SECRETKEY        = "secretKey";
 }

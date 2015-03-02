@@ -28,8 +28,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.os.AsyncTask;
 
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -38,12 +43,15 @@ import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.PlusShare;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
+import com.soomla.Soomla;
+import com.soomla.SoomlaApp;
 import com.soomla.SoomlaUtils;
 import com.soomla.profile.auth.AuthCallbacks;
 import com.soomla.profile.domain.UserProfile;
 import com.soomla.profile.social.ISocialProvider;
 import com.soomla.profile.social.SocialCallbacks;
 
+import java.io.IOException;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -58,6 +66,8 @@ import java.util.Map;
 public class SoomlaGooglePlus implements ISocialProvider{
 
     private static final String TAG = "SOOMLA SoomlaGoogle";
+    public static final String SCOPES = "https://www.googleapis.com/auth/plus.login " + "https://www.googleapis.com/auth/drive.file";
+    public static final int REQUEST_CODE_TOKEN_AUTH = 125;
 
     private static GoogleApiClient GooglePlusAPIClient;
     private static WeakReference<Activity> WeakRefParentActivity;
@@ -233,7 +243,7 @@ public class SoomlaGooglePlus implements ISocialProvider{
             }
         }
 
-        @TargetApi(Build.VERSION_CODES.DONUT)
+//        @TargetApi(Build.VERSION_CODES.DONUT)
         private void resolveSignInError(){
             try {
                 connectionInProgress = true;
@@ -356,19 +366,72 @@ public class SoomlaGooglePlus implements ISocialProvider{
         parentActivity.startActivity(browserIntent);
     }
 
+
+
+    @TargetApi(Build.VERSION_CODES.CUPCAKE)
     @Override
-    public void getUserProfile(AuthCallbacks.UserProfileListener userProfileListener) {
+    public void getUserProfile(final AuthCallbacks.UserProfileListener userProfileListener) {
         SoomlaUtils.LogDebug(TAG, "getUserProfile");
         RefProvider = getProvider();
         try{
             Person profile = Plus.PeopleApi.getCurrentPerson(GooglePlusAPIClient);
-            String email = Plus.AccountApi.getAccountName(GooglePlusAPIClient);
+            final String email = Plus.AccountApi.getAccountName(GooglePlusAPIClient);
             final UserProfile userProfile = new UserProfile(getProvider(), profile.getId(),
                     profile.getDisplayName(), email,
                     profile.getName().getGivenName(), profile.getName().getFamilyName());
             userProfile.setAvatarLink(profile.getImage().getUrl());
-            userProfileListener.success(userProfile);
+            SoomlaUtils.LogDebug(TAG, "Lalala");
 
+            AsyncTask<Void, Void, String> task = new AsyncTask<Void, Void, String>() {
+                @Override
+                protected String doInBackground(Void... params) {
+                    String token = null;
+
+                    try {
+//                        String link = "oauth2:" + Scopes.PLUS_LOGIN + " https://www.googleapis.com/auth/plus.profile.emails.read";
+                        token = GoogleAuthUtil.getToken(SoomlaApp.getAppContext(), email, "oauth2:" + SCOPES);
+                    } catch (IOException transientEx) {
+                        // Network or server error, try later
+                        SoomlaUtils.LogDebug(TAG, transientEx.toString());
+                        userProfileListener.fail("Unable to get user profile with exception: " + transientEx.getMessage());
+                    } catch (UserRecoverableAuthException e) {
+                        // Recover (with e.getIntent())
+                        SoomlaUtils.LogDebug(TAG, e.toString());
+                        Intent recover = e.getIntent();
+                        WeakRefParentActivity.get().startActivityForResult(recover, REQUEST_CODE_TOKEN_AUTH);
+                        userProfileListener.fail("Unable to get user profile with exception: " + e.getMessage());
+                    } catch (GoogleAuthException authEx) {
+                        // The call is not ever expected to succeed
+                        // assuming you have already verified that
+                        // Google Play services is installed.
+                        SoomlaUtils.LogDebug(TAG, authEx.toString());
+                        userProfileListener.fail("Unable to get user profile with exception: " + authEx.getMessage());
+                    }
+
+                    return token;
+                }
+
+                @Override
+                protected void onCancelled() {
+                    super.onCancelled();
+                    userProfileListener.fail("Task cancelled");
+                }
+
+                @Override
+                protected void onPostExecute(String token) {
+                    SoomlaUtils.LogDebug(TAG, "Access token retrieved:" + token);
+                    if(token != null && !token.isEmpty()) {
+                        userProfile.setAccessToken(token);
+                        userProfileListener.success(userProfile);
+                    }
+                    else {
+                        userProfileListener.fail("Can not retrieve access token, something wrong happened, please try again later");
+                    }
+                }
+
+            };
+            task.execute();
+//            userProfileListener.success(userProfile);
         }catch (Exception e){
             userProfileListener.fail("Unable to get user profile with exception: " + e.getMessage());
         }

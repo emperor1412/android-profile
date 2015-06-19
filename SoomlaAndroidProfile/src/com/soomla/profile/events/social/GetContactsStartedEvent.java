@@ -23,15 +23,18 @@ import com.soomla.profile.social.ISocialProvider;
  * This event is fired when the get contacts process from a provider has started
  */
 public class GetContactsStartedEvent extends BaseSocialActionEvent {
+    public final boolean FromStart;
+
     /**
      * Constructor
-     *
      * @param provider The provider on which the get contacts process started
      * @param socialActionType The social action preformed
+     * @param fromStart Should we reset pagination or request the next page
      * @param payload an identification String sent from the caller of the action
      */
     public GetContactsStartedEvent(IProvider.Provider provider,
-                                   ISocialProvider.SocialActionType socialActionType, String payload) {
+                                   ISocialProvider.SocialActionType socialActionType, boolean fromStart, String payload) {
         super(provider, socialActionType, payload);
+        this.FromStart = fromStart;
     }
 }

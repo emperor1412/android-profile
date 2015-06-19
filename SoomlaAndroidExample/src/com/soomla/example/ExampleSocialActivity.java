@@ -397,6 +397,13 @@ public class ExampleSocialActivity extends Activity {
         for (UserProfile contact : contacts) {
             Log.d(TAG, "contact:" + contact.toJSONObject().toString());
         }
+        if (contactsFinishedEvent.HasMore) {
+            try {
+                SoomlaProfile.getInstance().getContacts(contactsFinishedEvent.Provider, null);
+            } catch (ProviderNotFoundException e) {
+                Log.w(TAG, "cannot getContacts:", e);
+            }
+        }
     }
 
     @Subscribe

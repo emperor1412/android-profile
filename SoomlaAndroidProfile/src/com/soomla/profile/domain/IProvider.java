@@ -24,7 +24,11 @@ import java.util.Map;
  */
 public interface IProvider {
 
-    void applyParams(Map<String, String> providerParams);
+    /**
+     * The place, where you can configure the provider, using params passed by user.
+     * @param providerParams params of this provider, passed during Profile initialization
+     */
+    void configure(Map<String, String> providerParams);
 
     Provider getProvider();
 

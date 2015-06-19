@@ -42,7 +42,7 @@ public abstract class ProviderLoader<T extends IProvider> {
                 T provider = aClass.newInstance();
                 IProvider.Provider targetProvider = provider.getProvider();
                 if (providerParams != null) {
-                    provider.applyParams(providerParams.get(targetProvider));
+                    provider.configure(providerParams.get(targetProvider));
                 }
                 mProviders.put(targetProvider, provider);
             } catch (Exception e) {

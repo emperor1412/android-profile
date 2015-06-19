@@ -28,18 +28,21 @@ public class GetContactsFailedEvent extends BaseSocialActionEvent {
      */
     public final String ErrorDescription;
 
+    public final boolean FromStart;
+
     /**
      * Constructor
-     *
      * @param provider The provider on which the get contacts process has failed
      * @param socialActionType The social action preformed
      * @param errorDescription a Description of the reason for failure
+     * @param fromStart Should we reset pagination or request the next page
      * @param payload an identification String sent from the caller of the action
      */
     public GetContactsFailedEvent(IProvider.Provider provider,
                                   ISocialProvider.SocialActionType socialActionType,
-                                  String errorDescription, String payload) {
+                                  String errorDescription, boolean fromStart, String payload) {
         super(provider, socialActionType, payload);
         this.ErrorDescription = errorDescription;
+        this.FromStart = fromStart;
     }
 }

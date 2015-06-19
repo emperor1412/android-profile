@@ -18,11 +18,8 @@ package com.soomla.profile.social.google;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -80,6 +77,8 @@ public class SoomlaGooglePlus implements ISocialProvider{
     public static final int ACTION_UPLOAD_IMAGE = 2;
     public static final int ACTION_PUBLISH_STORY = 3;
     public static final int ACTION_PUBLISH_STATUS_DIALOG = 4;
+
+    private String lastContactCursor = null;
 
     /**
      * The main Soomla Google Plus activity
@@ -236,6 +235,8 @@ public class SoomlaGooglePlus implements ISocialProvider{
 
                     if (signInRequested)
                         resolveSignInError();
+                    else
+                        finish();
                 }
             } else {
                 RefLoginListener.fail("onConnectionFailed:" + result.getErrorCode() + " [" + RefLoginListener + "]");
@@ -361,8 +362,8 @@ public class SoomlaGooglePlus implements ISocialProvider{
     }
 
     @Override
-    public void like(Activity parentActivity, String pageName) {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://plus.google.com/+" + pageName));
+    public void like(Activity parentActivity, String pageId) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://plus.google.com/+" + pageId));
         parentActivity.startActivity(browserIntent);
     }
 
@@ -438,10 +439,12 @@ public class SoomlaGooglePlus implements ISocialProvider{
     }
 
     @Override
-    public void getContacts(final SocialCallbacks.ContactsListener contactsListener) {
+    public void getContacts(boolean fromStart, final SocialCallbacks.ContactsListener contactsListener) {
         RefProvider = getProvider();
         if (GooglePlusAPIClient != null && GooglePlusAPIClient.isConnected()){
-            Plus.PeopleApi.loadVisible(GooglePlusAPIClient, null)
+            String lastContactCursor = this.lastContactCursor;
+            this.lastContactCursor = null;
+            Plus.PeopleApi.loadVisible(GooglePlusAPIClient, fromStart ? null : lastContactCursor)
                     .setResultCallback(new ResultCallback<People.LoadPeopleResult>() {
                         @Override
                         public void onResult(People.LoadPeopleResult peopleData) {
@@ -454,7 +457,9 @@ public class SoomlaGooglePlus implements ISocialProvider{
                                         Person googleContact = personBuffer.get(i);
                                         userProfiles.add(parseGoogleContact(googleContact));
                                     }
-                                    contactsListener.success(userProfiles);
+                                    SoomlaGooglePlus.this.lastContactCursor = peopleData.getNextPageToken();
+
+                                    contactsListener.success(userProfiles, SoomlaGooglePlus.this.lastContactCursor != null);
                                 } catch (Exception e){
                                     contactsListener.fail("Failed getting contacts with exception: " + e.getMessage());
                                 }finally {
@@ -471,12 +476,12 @@ public class SoomlaGooglePlus implements ISocialProvider{
     }
 
     @Override
-    public void applyParams(Map<String, String> providerParams) {
+    public void configure(Map<String, String> providerParams) {
         // Nothing to do here Google handles all needed parameters
     }
 
     @Override
-    public void getFeed(SocialCallbacks.FeedListener feedsListener) {
+    public void getFeed(Boolean fromStart, SocialCallbacks.FeedListener feedsListener) {
         //TODO
         feedsListener.fail("getFeed is not implemented");
     }

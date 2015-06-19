@@ -69,7 +69,7 @@ public class SocialCallbacks {
         /**
          * Performs the following function upon success.
          */
-        public void success(List<UserProfile> userProfiles);
+        public void success(List<UserProfile> userProfiles, boolean hasMore);
 
         /**
          * Performs the following function upon failure and prints the given message.
@@ -88,7 +88,7 @@ public class SocialCallbacks {
          * Performs the following function upon success.
          */
         //todo: model feed
-        public void success(List<String> feeds);
+        public void success(List<String> feeds, boolean hasMore);
 
         /**
          * Performs the following function upon failure and prints the given message.

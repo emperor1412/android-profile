@@ -29,19 +29,22 @@ public class GetFeedFinishedEvent extends BaseSocialActionEvent {
      * an Array of feed entries represented by strings
      */
     public final List<String> Posts;
+    public final boolean HasMore;
 
     /**
      * Constructor
-     *
      * @param provider The provider on which the get feed process finished
-     * @param getFeedType The social action preformed
+     * @param getFeedType The social action performed
      * @param feedPosts an Array of feed entries represented by strings
      * @param payload an identification String sent from the caller of the action
+     * @param hasMore Should we reset pagination or request the next page
      */
     public GetFeedFinishedEvent(IProvider.Provider provider,
                                 ISocialProvider.SocialActionType getFeedType,
-                                List<String> feedPosts, String payload) {
+                                List<String> feedPosts, String payload, boolean hasMore) {
+
         super(provider, getFeedType, payload);
         Posts = feedPosts;
+        HasMore = hasMore;
     }
 }

@@ -23,15 +23,18 @@ import com.soomla.profile.social.ISocialProvider;
  * This event is fired when the get feed process from a provider has started
  */
 public class GetFeedStartedEvent extends BaseSocialActionEvent {
+    public final Boolean FromStart;
+
     /**
      * Constructor
-     *
-     * @param provider The provider on which the get feed process started
+     *  @param provider The provider on which the get feed process started
      * @param getFeedType The social action preformed
+     * @param fromStart Should we reset pagination or request the next page
      * @param payload an identification String sent from the caller of the action
      */
     public GetFeedStartedEvent(IProvider.Provider provider,
-                               ISocialProvider.SocialActionType getFeedType, String payload) {
+                               ISocialProvider.SocialActionType getFeedType, Boolean fromStart, String payload) {
         super(provider, getFeedType, payload);
+        FromStart = fromStart;
     }
 }

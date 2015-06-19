@@ -138,6 +138,7 @@ public class StorePacksActivity extends Activity {
         TextView muffinsBalance = (TextView)findViewById(R.id.balance);
         muffinsBalance.setText("" + StorageManager.getVirtualCurrencyStorage().
                 getBalance(StoreInfo.getCurrencies().get(0).getItemId()));
+
     }
 
     /**

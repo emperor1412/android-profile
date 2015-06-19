@@ -28,18 +28,21 @@ public class GetFeedFailedEvent extends BaseSocialActionEvent {
      */
     public final String ErrorDescription;
 
+    public final Boolean FromStart;
+
     /**
      * Constructor
-     *
-     * @param provider The provider on which the get feed process has
+     *  @param provider The provider on which the get feed process has
      * @param getFeedType The social action preformed
      * @param errorDescription a Description of the reason for failure
+     * @param fromStart Should we reset pagination or request the next page
      * @param payload an identification String sent from the caller of the action
      */
     public GetFeedFailedEvent(IProvider.Provider provider,
                               ISocialProvider.SocialActionType getFeedType,
-                              String errorDescription, String payload) {
+                              String errorDescription, Boolean fromStart, String payload) {
         super(provider, getFeedType, payload);
         ErrorDescription = errorDescription;
+        FromStart = fromStart;
     }
 }

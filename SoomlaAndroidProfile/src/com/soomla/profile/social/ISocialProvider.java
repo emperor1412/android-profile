@@ -17,7 +17,6 @@
 package com.soomla.profile.social;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
 
 import com.soomla.profile.auth.IAuthProvider;
 
@@ -81,17 +80,18 @@ public interface ISocialProvider extends IAuthProvider {
 
     /**
      * Fetches the user's contact list
-     *
+     * @param fromStart Should we reset pagination or request the next page
      * @param contactsListener a callback for this action
      */
-    void getContacts(SocialCallbacks.ContactsListener contactsListener);
+    void getContacts(boolean fromStart, SocialCallbacks.ContactsListener contactsListener);
 
     /**
      * Fetches the user's feed.
      *
+     * @param fromStart Should we reset pagination or request the next page
      * @param feedsListener a callback for this action
      */
-    void getFeed(SocialCallbacks.FeedListener feedsListener);
+    void getFeed(Boolean fromStart, SocialCallbacks.FeedListener feedsListener);
 
     /**
      * Shares a photo to the user's feed
@@ -107,9 +107,9 @@ public interface ISocialProvider extends IAuthProvider {
      * Opens up a "like" page for current provider (external)
      *
      * @param activity The parent activity
-     * @param pageName The page to open up
+     * @param pageId The page to open up
      */
-    void like(final Activity activity, String pageName);
+    void like(final Activity activity, String pageId);
 
     /**
      * an Enumeration which lists all available social actions

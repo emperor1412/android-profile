@@ -58,6 +58,7 @@ public class SoomlaTwitter implements ISocialProvider {
     private static final String TWITTER_SCREEN_NAME = "oauth.screenName";
 
     private static final String OAUTH_VERIFIER = "oauth_verifier";
+    private static final int PAGE_SIZE = 20;
 
     // some weak refs that are set before launching the wrapper SoomlaTwitterActivity
     // (need to be accessed by static context)
@@ -91,6 +92,9 @@ public class SoomlaTwitter implements ISocialProvider {
     public static final int ACTION_GET_USER_PROFILE = 17;
 
     private int preformingAction = -1;
+
+    private long lastContactCursor = -1;
+    private int lastFeedCursor = 1;
 
     /**
      * Twitter4J uses an old listener model in which you provide a listener
@@ -170,11 +174,21 @@ public class SoomlaTwitter implements ISocialProvider {
         public void gotUserTimeline(ResponseList<Status> statuses) {
             SoomlaUtils.LogDebug(TAG, "getFeed/onComplete");
 
+
             List<String> feeds = new ArrayList<String>();
             for (Status post : statuses) {
                 feeds.add(post.getText());
             }
-            RefFeedListener.success(feeds);
+
+            boolean hasMore;
+            if (feeds.size() >= PAGE_SIZE) {
+                lastFeedCursor ++;
+                hasMore = true;
+            } else {
+                lastFeedCursor = 1;
+                hasMore = false;
+            }
+            RefFeedListener.success(feeds, hasMore);
             clearListener(ACTION_GET_FEED);
         }
 
@@ -191,7 +205,10 @@ public class SoomlaTwitter implements ISocialProvider {
             for (User profile : users) {
                 userProfiles.add(createUserProfile(profile));
             }
-            RefContactsListener.success(userProfiles);
+            if (users.hasNext()) {
+                lastContactCursor = users.getNextCursor();
+            }
+            RefContactsListener.success(userProfiles, users.hasNext());
             clearListener(ACTION_GET_CONTACTS);
         }
 
@@ -502,7 +519,7 @@ public class SoomlaTwitter implements ISocialProvider {
      * {@inheritDoc}
      */
     @Override
-    public void getContacts(final SocialCallbacks.ContactsListener contactsListener) {
+    public void getContacts(boolean fromStart, final SocialCallbacks.ContactsListener contactsListener) {
         if (!isInitialized) {
             return;
         }
@@ -515,7 +532,8 @@ public class SoomlaTwitter implements ISocialProvider {
         preformingAction = ACTION_GET_USER_PROFILE;
 
         try {
-            twitter.getFriendsList(twitterScreenName, -1);
+            twitter.getFriendsList(twitterScreenName, fromStart ? -1 : this.lastContactCursor);
+            this.lastContactCursor = -1;
         } catch (Exception e) {
             failListener(ACTION_GET_USER_PROFILE, e.getMessage());
         }
@@ -525,7 +543,7 @@ public class SoomlaTwitter implements ISocialProvider {
      * {@inheritDoc}
      */
     @Override
-    public void getFeed(final SocialCallbacks.FeedListener feedListener) {
+    public void getFeed(Boolean fromStart, final SocialCallbacks.FeedListener feedListener) {
         if (!isInitialized) {
             return;
         }
@@ -538,7 +556,12 @@ public class SoomlaTwitter implements ISocialProvider {
         preformingAction = ACTION_GET_FEED;
 
         try {
-            twitter.getUserTimeline(twitterScreenName);
+            if (fromStart) {
+                this.lastFeedCursor = 1;
+            }
+
+            Paging paging = new Paging(this.lastFeedCursor, PAGE_SIZE);
+            twitter.getUserTimeline(paging);
         } catch (Exception e) {
             failListener(ACTION_GET_FEED, e.getMessage());
         }
@@ -573,10 +596,10 @@ public class SoomlaTwitter implements ISocialProvider {
      * {@inheritDoc}
      */
     @Override
-    public void like(final Activity parentActivity, String pageName) {
+    public void like(final Activity parentActivity, String pageId) {
         SoomlaUtils.LogDebug(TAG, "like");
 
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.twitter.com/" + pageName));
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.twitter.com/" + pageId));
         parentActivity.startActivity(browserIntent);
     }
 
@@ -584,7 +607,7 @@ public class SoomlaTwitter implements ISocialProvider {
      * {@inheritDoc}
      */
     @Override
-    public void applyParams(Map<String, String> providerParams) {
+    public void configure(Map<String, String> providerParams) {
         if (providerParams != null) {
             twitterConsumerKey = providerParams.get("consumerKey");
             twitterConsumerSecret = providerParams.get("consumerSecret");

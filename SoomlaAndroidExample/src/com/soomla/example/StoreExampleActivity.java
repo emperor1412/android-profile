@@ -133,8 +133,8 @@ public class StoreExampleActivity extends Activity {
         facebookParams.put("permissions", "email,user_friends");
 
         HashMap<String, String> twitterParams = new HashMap<String, String>();
-        twitterParams.put("consumerKey", "[YOUR CONSUMER KEY]");
-        twitterParams.put("consumerSecret", "[YOUR CONSUMER SECRET]");
+        twitterParams.put("consumerKey", "B8tcd5BdFU4EvwhO0zkB6i8eA");
+        twitterParams.put("consumerSecret", "5l5mknNzDCGb2SCo1HzEYFExZaULU3AInEXf9L2cl9gyIxvFTi");
 
         providerParams.put(IProvider.Provider.FACEBOOK, facebookParams);
         providerParams.put(IProvider.Provider.TWITTER, twitterParams);
